@@ -1,18 +1,22 @@
 package com.disastermanagement.dto;
 
+import java.time.LocalDateTime;
+
 public class InfoResponse {
 
     private String application;
-    private String status;
     private String version;
+    private String status;
+    private LocalDateTime timestamp;
 
     public InfoResponse() {
     }
 
-    public InfoResponse(String application, String status, String version) {
+    public InfoResponse(String application, String version, String status, LocalDateTime timestamp) {
         this.application = application;
-        this.status = status;
         this.version = version;
+        this.status = status;
+        this.timestamp = timestamp;
     }
 
     public String getApplication() {
@@ -23,6 +27,14 @@ public class InfoResponse {
         this.application = application;
     }
 
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -31,11 +43,11 @@ public class InfoResponse {
         this.status = status;
     }
 
-    public String getVersion() {
-        return version;
+    public LocalDateTime getTimestamp() {
+        return timestamp;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 }
