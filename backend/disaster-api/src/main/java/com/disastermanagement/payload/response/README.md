@@ -1,0 +1,3 @@
+# response
+
+Placeholder for DTOs.
