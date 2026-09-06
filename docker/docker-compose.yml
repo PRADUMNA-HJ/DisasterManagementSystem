@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+
+  # MySQL 8.0 Database Service
+  db:
+    image: mysql:8.0
+    container_name: disaster-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-disaster_management_db}
+      MYSQL_USER: ${MYSQL_USER:-disaster_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-disaster_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    networks:
+      - disaster-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot Backend API Service
+  backend:
+    build:
+      context: ./backend/disaster-api
+      dockerfile: ../../docker/Dockerfile.backend
+    container_name: disaster-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-disaster_management_db}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-disaster_user}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-disaster_password}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APPLICATION_SECURITY_JWT_SECRET_KEY: ${JWT_SECRET_KEY:-404E635266556A586E3272357538782F413F4428472B4B6250655368566D5971}
+      APPLICATION_SECURITY_JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - disaster-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  disaster-network:
+    driver: bridge

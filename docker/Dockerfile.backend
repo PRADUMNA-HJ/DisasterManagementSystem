@@ -1,0 +1,41 @@
+# Stage 1: Build the application with Maven
+FROM eclipse-temurin:21-jdk-alpine AS builder
+
+WORKDIR /app
+
+# Copy the Maven wrapper and pom.xml first to leverage Docker layer caching
+COPY mvnw pom.xml ./
+COPY .mvn .mvn
+
+# Download dependencies in a separate cached layer
+RUN ./mvnw dependency:go-offline -B
+
+# Copy source code and build the executable JAR (skip tests in Docker build)
+COPY src ./src
+RUN ./mvnw clean package -DskipTests -B
+
+# -------------------------------------------------------------------
+# Stage 2: Minimal runtime image
+FROM eclipse-temurin:21-jre-alpine AS runtime
+
+WORKDIR /app
+
+# Create non-root user for security
+RUN addgroup -S disaster && adduser -S disaster -G disaster
+
+# Copy only the executable JAR from the builder stage
+COPY --from=builder /app/target/disaster-api-*.jar app.jar
+
+# Set file ownership to non-root user
+RUN chown disaster:disaster app.jar
+
+USER disaster
+
+# Expose Spring Boot application port
+EXPOSE 8080
+
+# JVM tuning for container environments
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+
+# Application entrypoint
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

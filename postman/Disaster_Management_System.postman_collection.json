@@ -1,0 +1,552 @@
+{
+  "info": {
+    "_postman_id": "8e3c79a4-2b4f-4d91-8c7e-123456789abc",
+    "name": "Disaster Management System API",
+    "description": "Complete REST API collection for Disaster Management System including Auth, Disasters, Shelters, Users, Resource Requests, and Incident Logs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwtToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. Health & System Info",
+      "item": [
+        {
+          "name": "Get System Info",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/info",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "info"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data && jsonData.data.token) {",
+                  "    pm.environment.set('jwtToken', jsonData.data.token);",
+                  "    pm.environment.set('userId', jsonData.data.userId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Pradumna HJ\",\n  \"email\": \"pradumna@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+91-9876543210\",\n  \"city\": \"Bangalore\",\n  \"role\": \"CITIZEN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data && jsonData.data.token) {",
+                  "    pm.environment.set('jwtToken', jsonData.data.token);",
+                  "    pm.environment.set('userId', jsonData.data.userId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pradumna@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile (/me)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Disasters",
+      "item": [
+        {
+          "name": "Get All Disasters (Paginated)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/disasters?page=0&size=20&sort=reportedAt,desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "disasters"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "sort", "value": "reportedAt,desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Disaster by ID",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/disasters/{{disasterId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "disasters", "{{disasterId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Disasters by Location",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/disasters/search?location=Bangalore&page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "disasters", "search"],
+              "query": [
+                { "key": "location", "value": "Bangalore" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter Disasters by Severity",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/disasters/filter?severity=HIGH&page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "disasters", "filter"],
+              "query": [
+                { "key": "severity", "value": "HIGH" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Report a Disaster",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Major Landslide on Highway 66\",\n  \"description\": \"Rockfall and mud debris completely blocking traffic.\",\n  \"location\": \"Wayanad\",\n  \"disasterType\": \"LANDSLIDE\",\n  \"severity\": \"CRITICAL\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/disasters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "disasters"]
+            }
+          }
+        },
+        {
+          "name": "Update Disaster Report",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Major Landslide on Highway 66 (Cleared)\",\n  \"description\": \"Road partially opened for emergency relief vehicles.\",\n  \"location\": \"Wayanad\",\n  \"disasterType\": \"LANDSLIDE\",\n  \"severity\": \"MEDIUM\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/disasters/{{disasterId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "disasters", "{{disasterId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Disaster Report",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/disasters/{{disasterId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "disasters", "{{disasterId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Shelters",
+      "item": [
+        {
+          "name": "Get All Shelters (Paginated)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/shelters?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "shelters"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Shelter by ID",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/shelters/{{shelterId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "shelters", "{{shelterId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Shelters by City",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/shelters/search?city=Bangalore&page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "shelters", "search"],
+              "query": [
+                { "key": "city", "value": "Bangalore" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Shelter (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Indiranagar Relief Center\",\n  \"address\": \"100 Feet Road, Indiranagar\",\n  \"city\": \"Bangalore\",\n  \"capacity\": 500,\n  \"occupied\": 120,\n  \"latitude\": 12.971891,\n  \"longitude\": 77.641151\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/shelters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "shelters"]
+            }
+          }
+        },
+        {
+          "name": "Update Shelter (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Indiranagar Relief Center\",\n  \"address\": \"100 Feet Road, Indiranagar\",\n  \"city\": \"Bangalore\",\n  \"capacity\": 600,\n  \"occupied\": 180,\n  \"latitude\": 12.971891,\n  \"longitude\": 77.641151\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/shelters/{{shelterId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "shelters", "{{shelterId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Shelter (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/shelters/{{shelterId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "shelters", "{{shelterId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Resource Requests",
+      "item": [
+        {
+          "name": "Get All Resource Requests (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resource-requests?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "resource-requests"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Resource Request by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resource-requests/{{resourceRequestId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "resource-requests", "{{resourceRequestId}}"]
+            }
+          }
+        },
+        {
+          "name": "Filter Resource Requests by Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resource-requests/status?status=PENDING&page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "resource-requests", "status"],
+              "query": [
+                { "key": "status", "value": "PENDING" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Resource Request",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceType\": \"FOOD\",\n  \"quantity\": 200,\n  \"userId\": {{userId}},\n  \"disasterReportId\": {{disasterId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resource-requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "resource-requests"]
+            }
+          }
+        },
+        {
+          "name": "Update Resource Request Status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resource-requests/{{resourceRequestId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "resource-requests", "{{resourceRequestId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Delete Resource Request (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resource-requests/{{resourceRequestId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "resource-requests", "{{resourceRequestId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Incident Logs",
+      "item": [
+        {
+          "name": "Get Incident Logs by Disaster",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/incident-logs/disaster/{{disasterId}}?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "incident-logs", "disaster", "{{disasterId}}"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Incident Log",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Helicopter reconnaissance completed. Medical aid air-dropped.\",\n  \"disasterReportId\": {{disasterId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/incident-logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "incident-logs"]
+            }
+          }
+        },
+        {
+          "name": "Delete Incident Log (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/incident-logs/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "incident-logs", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Users (Admin)",
+      "item": [
+        {
+          "name": "Get All Users (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create User (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Officer Rajesh\",\n  \"email\": \"rajesh.rescue@gov.in\",\n  \"password\": \"securePass123\",\n  \"phone\": \"+91-9876543222\",\n  \"city\": \"Chennai\",\n  \"roleId\": 4\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "Update User (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Officer Rajesh Kumar\",\n  \"email\": \"rajesh.rescue@gov.in\",\n  \"phone\": \"+91-9876543222\",\n  \"city\": \"Chennai\",\n  \"roleId\": 4,\n  \"enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete User (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

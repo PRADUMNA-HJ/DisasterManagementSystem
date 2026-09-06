@@ -2,6 +2,9 @@ package com.disastermanagement.service;
 
 import com.disastermanagement.dto.CreateDisasterRequest;
 import com.disastermanagement.dto.DisasterResponse;
+import com.disastermanagement.dto.PagedResponse;
+import com.disastermanagement.dto.UpdateDisasterRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,41 +16,57 @@ import java.util.Optional;
 public interface DisasterReportService {
 
     /**
-     * Retrieve all disaster records.
-     * 
-     * @return List of all disaster responses.
+     * Retrieve all disaster records without pagination.
      */
     List<DisasterResponse> getAllDisasters();
 
     /**
-     * Retrieve a specific disaster record by its unique ID.
-     * 
-     * @param id Unique identifier of the disaster.
-     * @return Optional containing DisasterResponse if found, or empty Optional if not found.
+     * Retrieve all disaster records with pagination and sorting.
+     */
+    PagedResponse<DisasterResponse> getAllDisasters(Pageable pageable);
+
+    /**
+     * Retrieve a specific disaster record by its unique ID (Optional return).
      */
     Optional<DisasterResponse> getDisasterById(Long id);
 
     /**
-     * Search disaster records filtered by location.
-     * 
-     * @param location Location name to filter by.
-     * @return List of disaster responses matching the specified location.
+     * Retrieve a specific disaster record by its unique ID, throwing ResourceNotFoundException if missing.
+     */
+    DisasterResponse getDisasterResponseById(Long id);
+
+    /**
+     * Search disaster records filtered by location without pagination.
      */
     List<DisasterResponse> searchDisastersByLocation(String location);
 
     /**
-     * Filter disaster records by severity level.
-     * 
-     * @param severity Severity level string to filter by.
-     * @return List of disaster responses matching the specified severity.
+     * Search disaster records filtered by location with pagination.
+     */
+    PagedResponse<DisasterResponse> searchDisastersByLocation(String location, Pageable pageable);
+
+    /**
+     * Filter disaster records by severity level without pagination.
      */
     List<DisasterResponse> filterDisastersBySeverity(String severity);
 
     /**
+     * Filter disaster records by severity level with pagination.
+     */
+    PagedResponse<DisasterResponse> filterDisastersBySeverity(String severity, Pageable pageable);
+
+    /**
      * Process and record a new disaster report.
-     * 
-     * @param request Data transfer object containing disaster creation details.
-     * @return DisasterResponse containing created disaster information.
      */
     DisasterResponse createDisaster(CreateDisasterRequest request);
+
+    /**
+     * Update an existing disaster report with new details.
+     */
+    DisasterResponse updateDisaster(Long id, UpdateDisasterRequest request);
+
+    /**
+     * Delete an existing disaster report by its unique ID.
+     */
+    void deleteDisaster(Long id);
 }
